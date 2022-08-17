@@ -17,9 +17,11 @@ USE `gym_app` ;
 -- -----------------------------------------------------
 -- Table `gym_app`.`EXERCISE_TYPE`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `gym_app`.`EXERCISE_TYPE` ;
+
 CREATE TABLE IF NOT EXISTS `gym_app`.`EXERCISE_TYPE` (
   `exercise_type_name` NVARCHAR(45) NOT NULL,
-  `exercise_type_id` INT NOT NULL,
+  `exercise_type_id` INT NOT NULL AUTO_INCREMENT,
   `xfr` INT NULL,
   PRIMARY KEY (`exercise_type_id`))
 ENGINE = InnoDB;
@@ -28,6 +30,8 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `gym_app`.`USER`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `gym_app`.`USER` ;
+
 CREATE TABLE IF NOT EXISTS `gym_app`.`USER` (
   `fname` NVARCHAR(45) NOT NULL,
   `lname` NVARCHAR(45) NOT NULL,
@@ -35,7 +39,7 @@ CREATE TABLE IF NOT EXISTS `gym_app`.`USER` (
   `weight` INT NULL,
   `lbs_kg` TINYINT NOT NULL DEFAULT 0,
   `username` NVARCHAR(45) NOT NULL,
-  `user_id` INT NOT NULL,
+  `user_id` INT NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`user_id`))
 ENGINE = InnoDB;
 
@@ -43,8 +47,10 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `gym_app`.`WORKOUT_PLAN`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `gym_app`.`WORKOUT_PLAN` ;
+
 CREATE TABLE IF NOT EXISTS `gym_app`.`WORKOUT_PLAN` (
-  `workout_id` INT NOT NULL,
+  `workout_id` INT NOT NULL AUTO_INCREMENT,
   `user_id` INT NOT NULL,
   `date` DATE NOT NULL,
   `start_time` TIME NULL,
@@ -63,10 +69,12 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `gym_app`.`EXERCISE`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `gym_app`.`EXERCISE` ;
+
 CREATE TABLE IF NOT EXISTS `gym_app`.`EXERCISE` (
   `workout_id` INT NOT NULL,
   `exersice_type` INT NOT NULL,
-  `exersice_id` INT NOT NULL,
+  `exersice_id` INT NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`exersice_id`),
   INDEX `exercise-id-fk_idx` (`exersice_type` ASC) VISIBLE,
   CONSTRAINT `workout-id-fk`
@@ -85,9 +93,11 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `gym_app`.`MUSCLE`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `gym_app`.`MUSCLE` ;
+
 CREATE TABLE IF NOT EXISTS `gym_app`.`MUSCLE` (
   `muscle` NVARCHAR(45) NOT NULL,
-  `muscle_id` INT NOT NULL,
+  `muscle_id` INT NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`muscle_id`))
 ENGINE = InnoDB;
 
@@ -95,6 +105,8 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `gym_app`.`MUSCLE_HIT`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `gym_app`.`MUSCLE_HIT` ;
+
 CREATE TABLE IF NOT EXISTS `gym_app`.`MUSCLE_HIT` (
   `exersice_type_id` INT NOT NULL,
   `muscle_id` INT NOT NULL,
@@ -117,8 +129,10 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `gym_app`.`SET`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `gym_app`.`SET` ;
+
 CREATE TABLE IF NOT EXISTS `gym_app`.`SET` (
-  `set_id` INT NOT NULL,
+  `set_id` INT NOT NULL AUTO_INCREMENT,
   `weight_done` INT NULL,
   `reps_in_reserve` INT NULL,
   `reps` INT NULL,
@@ -130,6 +144,8 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `gym_app`.`SETS_DONE`
 -- -----------------------------------------------------
+DROP TABLE IF EXISTS `gym_app`.`SETS_DONE` ;
+
 CREATE TABLE IF NOT EXISTS `gym_app`.`SETS_DONE` (
   `exercise_id` INT NOT NULL,
   `set_id` INT NOT NULL,
