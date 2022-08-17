@@ -113,7 +113,7 @@ CREATE TABLE IF NOT EXISTS `gym_app`.`MUSCLE_HIT` (
   `activation_level` INT NULL,
   PRIMARY KEY (`exersice_type_id`, `muscle_id`),
   INDEX `muscle-id-fk_idx` (`muscle_id` ASC) VISIBLE,
-  CONSTRAINT `exercise-type-id-fk`
+  CONSTRAINT `exercise-type-fk`
     FOREIGN KEY (`exersice_type_id`)
     REFERENCES `gym_app`.`EXERCISE_TYPE` (`exercise_type_id`)
     ON DELETE NO ACTION
