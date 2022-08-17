@@ -2,8 +2,9 @@ import mysql.connector
 
 class DatabaseConnection:
 
-    def __init__(self, user='rebo', password='password', host='127.0.0.1', database='gym_app'):  
+    def __init__(self, user='rebo', password='password', host='192.168.0.101', database='gym_app'):
         self.cnx = mysql.connector.connect(user=user, password=password, host=host, database=database)
+        print(self.cnx)
 
     def __del__(self):
         self.cnx.close()
@@ -13,6 +14,7 @@ class DatabaseConnection:
     # User
     # Muscle
     # Exercise
+    # Exercise Type
     # Set
     # Workout Plan
 
@@ -27,14 +29,35 @@ class DatabaseConnection:
         return
 
     # Muscle (muscle, muscle_id)
-    def createMuscle(self):
+    def createMuscle(self, muscle):
+        cursor = self.cnx.cursor()
+        cursor.execute("INSERT INTO MUSCLE (muscle) VALUES (%s)", (muscle, ))
+        self.cnx.commit()
+
+    def deleteMuscle(self, muscle):
+        cursor = self.cnx.cursor()
+        cursor.execute("DELETE FROM MUSCLE WHERE muscle = %s", (muscle, ))
+        self.cnx.commit()
+
+    def getMuscle(self, muscle=None):
+        cursor = self.cnx.cursor()
+        if muscle:
+            cursor.execute("SELECT muscle FROM MUSCLE WHERE muscle = '%s'", (muscle, ))
+        else:
+            cursor.execute("SELECT muscle FROM MUSCLE")
+        return cursor.fetchall()
+
+    # exercise_type (exercise_type_name, xfr, exercise_type_id)
+    def createExerciseType(self):
         return
-    def deleteMuscle(self):
+    def deleteExerciseType(self):
         return
-    def getMuscle(self):
+    def updateExersiceType(self):
+        return
+    def getExercise(self):
         return
 
-    # Exercise (workout_id, exercise_type(exercise_type_name, exercise_type_id, xfr), sets_done(exercise_id, set_id), exercise_id)
+    # exercise (workout_id, exercise_type(exercise_type_name, exercise_type_id, xfr), sets_done(exercise_id, set_id), exercise_id)
     def createExercise(self):
         return
     def deleteExercise(self):
