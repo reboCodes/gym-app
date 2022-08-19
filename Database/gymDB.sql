@@ -20,10 +20,9 @@ USE `gym_app` ;
 DROP TABLE IF EXISTS `gym_app`.`EXERCISE_TYPE` ;
 
 CREATE TABLE IF NOT EXISTS `gym_app`.`EXERCISE_TYPE` (
-  `exercise_type_name` NVARCHAR(45) NOT NULL,
-  `exercise_type_id` INT NOT NULL AUTO_INCREMENT,
+  `exercise_type` NVARCHAR(45) NOT NULL,
   `xfr` INT NULL,
-  PRIMARY KEY (`exercise_type_id`))
+  PRIMARY KEY (`exercise_type`))
 ENGINE = InnoDB;
 
 
@@ -39,8 +38,7 @@ CREATE TABLE IF NOT EXISTS `gym_app`.`USER` (
   `weight` INT NULL,
   `lbs_kg` TINYINT NOT NULL DEFAULT 0,
   `username` NVARCHAR(45) NOT NULL,
-  `user_id` INT NOT NULL AUTO_INCREMENT,
-  PRIMARY KEY (`user_id`))
+  PRIMARY KEY (`username`))
 ENGINE = InnoDB;
 
 
@@ -51,16 +49,16 @@ DROP TABLE IF EXISTS `gym_app`.`WORKOUT_PLAN` ;
 
 CREATE TABLE IF NOT EXISTS `gym_app`.`WORKOUT_PLAN` (
   `workout_id` INT NOT NULL AUTO_INCREMENT,
-  `user_id` INT NOT NULL,
+  `username` NVARCHAR(45) NOT NULL,
   `date` DATE NOT NULL,
   `start_time` TIME NULL,
   `end_time` TIME NULL,
   `is_started` TINYINT NULL,
   PRIMARY KEY (`workout_id`),
-  INDEX `users-workout_idx` (`user_id` ASC) VISIBLE,
-  CONSTRAINT `user-work-fk`
-    FOREIGN KEY (`user_id`)
-    REFERENCES `gym_app`.`USER` (`user_id`)
+  INDEX `username-fk_idx` (`username` ASC) VISIBLE,
+  CONSTRAINT `username-fk`
+    FOREIGN KEY (`username`)
+    REFERENCES `gym_app`.`USER` (`username`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -73,18 +71,18 @@ DROP TABLE IF EXISTS `gym_app`.`EXERCISE` ;
 
 CREATE TABLE IF NOT EXISTS `gym_app`.`EXERCISE` (
   `workout_id` INT NOT NULL,
-  `exersice_type` INT NOT NULL,
-  `exersice_id` INT NOT NULL AUTO_INCREMENT,
-  PRIMARY KEY (`exersice_id`),
-  INDEX `exercise-id-fk_idx` (`exersice_type` ASC) VISIBLE,
+  `exercise_type` NVARCHAR(45) NOT NULL,
+  `exercise_name` NVARCHAR(45) NOT NULL,
+  PRIMARY KEY (`exercise_name`),
+  INDEX `exercise-type-fk_idx` (`exercise_type` ASC) VISIBLE,
   CONSTRAINT `workout-id-fk`
     FOREIGN KEY (`workout_id`)
     REFERENCES `gym_app`.`WORKOUT_PLAN` (`workout_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `exercise-type-id-fk`
-    FOREIGN KEY (`exersice_type`)
-    REFERENCES `gym_app`.`EXERCISE_TYPE` (`exercise_type_id`)
+  CONSTRAINT `exercise-type-fk`
+    FOREIGN KEY (`exercise_type`)
+    REFERENCES `gym_app`.`EXERCISE_TYPE` (`exercise_type`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -97,8 +95,7 @@ DROP TABLE IF EXISTS `gym_app`.`MUSCLE` ;
 
 CREATE TABLE IF NOT EXISTS `gym_app`.`MUSCLE` (
   `muscle` NVARCHAR(45) NOT NULL,
-  `muscle_id` INT NOT NULL AUTO_INCREMENT,
-  PRIMARY KEY (`muscle_id`))
+  PRIMARY KEY (`muscle`))
 ENGINE = InnoDB;
 
 
@@ -108,19 +105,19 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `gym_app`.`MUSCLE_HIT` ;
 
 CREATE TABLE IF NOT EXISTS `gym_app`.`MUSCLE_HIT` (
-  `exersice_type_id` INT NOT NULL,
-  `muscle_id` INT NOT NULL,
+  `muscle` NVARCHAR(45) NOT NULL,
   `activation_level` INT NULL,
-  PRIMARY KEY (`exersice_type_id`, `muscle_id`),
-  INDEX `muscle-id-fk_idx` (`muscle_id` ASC) VISIBLE,
-  CONSTRAINT `exercise-type-fk`
-    FOREIGN KEY (`exersice_type_id`)
-    REFERENCES `gym_app`.`EXERCISE_TYPE` (`exercise_type_id`)
+  `exercise-type` NVARCHAR(45) NOT NULL,
+  PRIMARY KEY (`muscle`, `exercise-type`),
+  INDEX `exercise-fk_idx` (`exercise-type` ASC) VISIBLE,
+  CONSTRAINT `exercise-fk`
+    FOREIGN KEY (`exercise-type`)
+    REFERENCES `gym_app`.`EXERCISE_TYPE` (`exercise_type`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `muscle-id-fk`
-    FOREIGN KEY (`muscle_id`)
-    REFERENCES `gym_app`.`MUSCLE` (`muscle_id`)
+  CONSTRAINT `muscle-fk`
+    FOREIGN KEY (`muscle`)
+    REFERENCES `gym_app`.`MUSCLE` (`muscle`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -147,13 +144,13 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `gym_app`.`SETS_DONE` ;
 
 CREATE TABLE IF NOT EXISTS `gym_app`.`SETS_DONE` (
-  `exercise_id` INT NOT NULL,
+  `exercise` NVARCHAR(45) NOT NULL,
   `set_id` INT NOT NULL,
-  PRIMARY KEY (`exercise_id`, `set_id`),
+  PRIMARY KEY (`exercise`, `set_id`),
   INDEX `set-set-id-fk_idx` (`set_id` ASC) VISIBLE,
   CONSTRAINT `exersice-set-id-fk`
-    FOREIGN KEY (`exercise_id`)
-    REFERENCES `gym_app`.`EXERCISE` (`exersice_id`)
+    FOREIGN KEY (`exercise`)
+    REFERENCES `gym_app`.`EXERCISE` (`exercise_name`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `set-set-id-fk`
