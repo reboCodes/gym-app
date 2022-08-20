@@ -107,11 +107,11 @@ DROP TABLE IF EXISTS `gym_app`.`MUSCLE_HIT` ;
 CREATE TABLE IF NOT EXISTS `gym_app`.`MUSCLE_HIT` (
   `muscle` NVARCHAR(45) NOT NULL,
   `activation_level` INT NULL,
-  `exercise-type` NVARCHAR(45) NOT NULL,
-  PRIMARY KEY (`muscle`, `exercise-type`),
-  INDEX `exercise-fk_idx` (`exercise-type` ASC) VISIBLE,
+  `exercise_type` NVARCHAR(45) NOT NULL,
+  PRIMARY KEY (`muscle`, `exercise_type`),
+  INDEX `exercise-fk_idx` (`exercise_type` ASC) VISIBLE,
   CONSTRAINT `exercise-fk`
-    FOREIGN KEY (`exercise-type`)
+    FOREIGN KEY (`exercise_type`)
     REFERENCES `gym_app`.`EXERCISE_TYPE` (`exercise_type`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
