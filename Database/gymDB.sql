@@ -124,11 +124,11 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `gym_app`.`SET`
+-- Table `gym_app`.`EXERCISE_SET`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `gym_app`.`SET` ;
+DROP TABLE IF EXISTS `gym_app`.`EXERCISE_SET` ;
 
-CREATE TABLE IF NOT EXISTS `gym_app`.`SET` (
+CREATE TABLE IF NOT EXISTS `gym_app`.`EXERCISE_SET` (
   `set_id` INT NOT NULL AUTO_INCREMENT,
   `weight_done` INT NULL,
   `reps_in_reserve` INT NULL,
@@ -155,7 +155,7 @@ CREATE TABLE IF NOT EXISTS `gym_app`.`SETS_DONE` (
     ON UPDATE NO ACTION,
   CONSTRAINT `set-set-id-fk`
     FOREIGN KEY (`set_id`)
-    REFERENCES `gym_app`.`SET` (`set_id`)
+    REFERENCES `gym_app`.`EXERCISE_SET` (`set_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
