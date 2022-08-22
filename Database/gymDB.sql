@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS `gym_app`.`EXERCISE` (
   `workout_id` INT NOT NULL,
   `exercise_type` NVARCHAR(45) NOT NULL,
   `exercise_name` NVARCHAR(45) NOT NULL,
-  PRIMARY KEY (`exercise_name`),
+  PRIMARY KEY (`exercise_name`, `workout_id`),
   INDEX `exercise-type-fk_idx` (`exercise_type` ASC) VISIBLE,
   CONSTRAINT `workout-id-fk`
     FOREIGN KEY (`workout_id`)
