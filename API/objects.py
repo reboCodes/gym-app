@@ -16,7 +16,7 @@ class Muscle:
 
     def delete(self):
         try:
-            self.cursor.execute("FROM MUSCLE WHERE muscle = %s;", (self.muscle, ))
+            self.cursor.execute("DELETE FROM MUSCLE WHERE muscle = %s;", (self.muscle, ))
             self.connection.commit()
             print(f"Deleted record {self.muscle} from MUSCLE.")
         except:
@@ -24,7 +24,7 @@ class Muscle:
 
     def deleteAll(self):
         try:
-            self.cursor.execute("FROM MUSCLE;")
+            self.cursor.execute("DELETE FROM MUSCLE;")
             self.connection.commit()
             print(f"Deleted all records from MUSCLE.")
         except:
@@ -129,7 +129,7 @@ class ExerciseType:
             print(f"Created record {self.exerciseType}, {self.xfr} in EXERCISE_TYPE.")
 
             for muscleHit in self.muscleHitList:
-                MuscleHit(self.connection, self.exerciseType, muscleHit["muscle"], muscleHit["acticationLevel"]).create()
+                MuscleHit(self.connection, self.exerciseType, muscleHit["muscle"], muscleHit["activation_level"]).create()
         except:
             print(f"Could not create record {self.exerciseType}, {self.xfr} in EXERCISE_TYPE.")
 
@@ -181,6 +181,7 @@ class Set:
             self.cursor.execute(sql, (self.weightDone, self.repsInReserve, self.reps, self.timeTaken))
             self.connection.commit()
             print(f"Created record {self.weightDone}, {self.repsInReserve}, {self.reps}, {self.timeTaken} in EXERCISE_SET.")
+            return self.cursor
         except:
             print(f"Could not create record {self.weightDone}, {self.repsInReserve}, {self.reps}, {self.timeTaken} in EXERCISE_SET.")
 
@@ -239,11 +240,11 @@ class SetsDone:
     def create(self):
         try:
             sql = "INSERT INTO SETS_DONE (exercise, set_id, workout_id) VALUES (%s, %s, %s);"
-            self.cursor.execute(sql, (self.exercise, self.set, self.workoutID))
+            self.cursor.execute(sql, (self.exercise, self.setID, self.workoutID))
             self.connection.commit()
-            print(f"Created record {self.exercise}, {self.set}, {self.workoutID} in SETS_DONE.")
+            print(f"Created record {self.exercise}, {self.setID}, {self.workoutID} in SETS_DONE.")
         except:
-            print(f"Could not create record {self.exercise}, {self.set}, {self.workoutID} to SETS_DONE.")
+            print(f"Could not create record {self.exercise}, {self.setID}, {self.workoutID} to SETS_DONE.")
 
     def delete(self):
         if not self.setID:
@@ -286,6 +287,10 @@ class Exercise:
         self.setList = setList
 
     def create(self):
+        #
+        # ADD SOMETHING HERE TO CHECK IF EXERCISE_TYPE EXISTS
+        # RETURN AN ERROR IF IT DOESN'T
+        #
         try:
             sql = "INSERT INTO EXERCISE (workout_id, exercise_type, exercise_name) VALUES (%s, %s, %s);"
             self.cursor.execute(sql, (self.workoutID, self.exerciseType, self.exerciseName))
@@ -293,7 +298,8 @@ class Exercise:
             print(f"Created record {self.workoutID}, {self.exerciseType}, {self.exerciseName} in EXERCISE.")
 
             for set in self.setList:
-                Set(self.connection, set["reps"], set["weight_done"], set["reps_in_reserve"], set["time_taken"]).create()
+                self.cursor = Set(self.connection, set["reps"] , set["weight_done"], set["reps_in_reserve"], set["time_taken"]).create()
+                SetsDone(self.connection, self.exerciseName, self.workoutID, self.cursor.lastrowid).create()
         except:
             print(f"Could not create record {self.workoutID}, {self.exerciseType}, {self.exerciseName} in EXERCISE.")
 
