@@ -146,8 +146,10 @@ DROP TABLE IF EXISTS `gym_app`.`SETS_DONE` ;
 CREATE TABLE IF NOT EXISTS `gym_app`.`SETS_DONE` (
   `exercise` NVARCHAR(45) NOT NULL,
   `set_id` INT NOT NULL,
-  PRIMARY KEY (`exercise`, `set_id`),
+  `workout_id` INT NOT NULL,
+  PRIMARY KEY (`exercise`, `set_id`, `workout_id`),
   INDEX `set-set-id-fk_idx` (`set_id` ASC) VISIBLE,
+  INDEX `workout-id-fk-sets_done_idx` (`workout_id` ASC) VISIBLE,
   CONSTRAINT `exersice-set-id-fk`
     FOREIGN KEY (`exercise`)
     REFERENCES `gym_app`.`EXERCISE` (`exercise_name`)
@@ -156,6 +158,11 @@ CREATE TABLE IF NOT EXISTS `gym_app`.`SETS_DONE` (
   CONSTRAINT `set-set-id-fk`
     FOREIGN KEY (`set_id`)
     REFERENCES `gym_app`.`EXERCISE_SET` (`set_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `workout-id-fk-sets_done`
+    FOREIGN KEY (`workout_id`)
+    REFERENCES `gym_app`.`EXERCISE` (`workout_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
