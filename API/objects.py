@@ -47,126 +47,71 @@ class Muscle:
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
 class MuscleHit:
-    def __init__(self, connection, exerciseType, muscle=None, activationLevel=None):
+    def __init__(self, connection, exercise, muscle=None, activationLevel=None):
         self.connection = connection
         self.cursor = self.connection.cursor()
-        self.exerciseType = exerciseType
+        self.exercise = exercise
         self.muscle = muscle
         self.activationLevel = activationLevel
 
     def create(self):
         try:
             Muscle(self.connection, self.muscle).create()
-            sql = "INSERT INTO MUSCLE_HIT (muscle, activation_level, exercise_type) VALUES (%s, %s, %s);"
-            self.cursor.execute(sql, (self.muscle, self.activationLevel, self.exerciseType))
+            sql = "INSERT INTO MUSCLE_HIT (muscle, activation_level, exercise) VALUES (%s, %s, %s);"
+            self.cursor.execute(sql, (self.muscle, self.activationLevel, self.exercise))
             self.connection.commit()
-            print(f"Created record {self.muscle}, {self.activationLevel}, {self.exerciseType} in MUSCLE_HIT.")
+            print(f"Created record {self.muscle}, {self.activationLevel}, {self.exercise} in MUSCLE_HIT.")
         except:
-            print(f"Could not create record {self.muscle}, {self.activationLevel}, {self.exerciseType} in MUSCLE_HIT.")
+            print(f"Could not create record {self.muscle}, {self.activationLevel}, {self.exercise} in MUSCLE_HIT.")
     
     def update(self, activationLevel):
-        if not self.muscle or not self.exerciseType:
-            print("Updating a record in MUSCLE_HIT requires values for muscle and exercise_type.")
+        if not self.muscle or not self.exercise:
+            print("Updating a record in MUSCLE_HIT requires values for muscle and exercise.")
             return
         try:
-            sql = "UPDATE MUSCLE_HIT SET activation_level = %s WHERE muscle = %s AND exercise_type = %s;"
-            self.cursor.execute(sql, (activationLevel, self.muscle, self.exerciseType))
+            sql = "UPDATE MUSCLE_HIT SET activation_level = %s WHERE muscle = %s AND exercise = %s;"
+            self.cursor.execute(sql, (activationLevel, self.muscle, self.exercise))
             self.connection.commit()
             self.activationLevel = activationLevel
-            print(f"Updated record {self.muscle}, {self.activationLevel}, {self.exerciseType} in MUSCLE_HIT.")
+            print(f"Updated record {self.muscle}, {self.activationLevel}, {self.exercise} in MUSCLE_HIT.")
         except:
-            print(f"Could not update record {self.muscle}, {self.activationLevel}, {self.exerciseType} in MUSCLE_HIT.")
+            print(f"Could not update record {self.muscle}, {self.activationLevel}, {self.exercise} in MUSCLE_HIT.")
 
     def delete(self):
         try:
-            sql = "FROM MUSCLE_HIT WHERE muscle = %s AND exercise_type = %s;"
-            self.cursor.execute(sql, (self.muscle, self.exerciseType))
+            sql = "FROM MUSCLE_HIT WHERE muscle = %s AND exercise = %s;"
+            self.cursor.execute(sql, (self.muscle, self.exercise))
             self.connection.commit()
-            print(f"Deleted record {self.muscle}, {self.exerciseType} from MUSCLE_HIT.")
+            print(f"Deleted record {self.muscle}, {self.exercise} from MUSCLE_HIT.")
         except:
-            print(f"Could not delete record {self.muscle}, {self.exerciseType} from MUSCLE_HIT.")
+            print(f"Could not delete record {self.muscle}, {self.exercise} from MUSCLE_HIT.")
 
-    def deleteByExerciseType(self):
+    def deleteByExercise(self):
         try:
-            sql = "FROM MUSCLE_HIT WHERE exercise_type = %s;"
-            self.cursor.execute(sql, (self.exerciseType,))
+            sql = "FROM MUSCLE_HIT WHERE exercise = %s;"
+            self.cursor.execute(sql, (self.exercise,))
             self.connection.commit()
-            print(f"Deleted records from MUSCLE_HIT where exercise_type = {self.exerciseType}.")
+            print(f"Deleted records from MUSCLE_HIT where exercise = {self.exercise}.")
         except:
-            print(f"Could not delete records from MUSCLE_HIT where exercise_type = {self.exerciseType}.")
+            print(f"Could not delete records from MUSCLE_HIT where exercise = {self.exercise}.")
 
     def get(self):
         try:
-            sql = "SELECT * FROM MUSCLE_HIT WHERE muscle = %s AND exercise_type = %s;"
-            self.cursor.execute(sql, (self.muscle, self.exerciseType))
+            sql = "SELECT * FROM MUSCLE_HIT WHERE muscle = %s AND exercise = %s;"
+            self.cursor.execute(sql, (self.muscle, self.exercise))
             return self.cursor.fetchone()
         except:
-            print(f"Could not get record {self.muscle}, {self.exerciseType} from MUSCLE_HIT.")
+            print(f"Could not get record {self.muscle}, {self.exercise} from MUSCLE_HIT.")
     
-    def getByExerciseType(self):
+    def getByExercise(self):
         try:
-            sql = "SELECT * FROM MUSCLE_HIT WHERE exercise_type = %s;"
-            self.cursor.execute(sql, (self.exerciseType, ))
+            sql = "SELECT * FROM MUSCLE_HIT WHERE exercise = %s;"
+            self.cursor.execute(sql, (self.exercise, ))
             return self.cursor.fetchall()
         except:
-            print(f"Could not get records with exercise_type {self.exerciseType} from MUSCLE_HIT.")
+            print(f"Could not get records with exercise {self.exercise} from MUSCLE_HIT.")
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-
-class ExerciseType:
-    def __init__(self, connection, exerciseType, xfr=None, muscleHitList=None):
-        self.connection = connection
-        self.cursor = self.connection.cursor()
-        self.exerciseType = exerciseType
-        self.xfr = xfr
-        self.muscleHitList = muscleHitList
-
-    def create(self):
-        try:
-            sql = "INSERT INTO EXERCISE_TYPE (exercise_type, xfr) VALUES (%s, %s);"
-            self.cursor.execute(sql, (self.exerciseType, self.xfr))
-            self.connection.commit()
-            print(f"Created record {self.exerciseType}, {self.xfr} in EXERCISE_TYPE.")
-
-            for muscleHit in self.muscleHitList:
-                MuscleHit(self.connection, self.exerciseType, muscleHit["muscle"], muscleHit["acticationLevel"]).create()
-        except:
-            print(f"Could not create record {self.exerciseType}, {self.xfr} in EXERCISE_TYPE.")
-
-    def update(self, xfr):
-        if not self.exerciseType:
-            print("Updating a record in EXERCISE_TYPE required a value for exercise_type.")
-            return
-        try:
-            sql = "UPDATE EXERCISE_TYPE SET xfr = %s WHERE exercise_type = %s;"
-            self.cursor.execute(sql, (xfr, self.exerciseType))
-            self.connection.execute()
-            self.xfr = xfr
-            print(f"Updated record {self.xfr}, {self.exerciseType} in EXERCISE_TYPE.")
-        except:
-            print(f"Could not update record {self.xfr}, {self.exerciseType} in EXERCISE_TYPE.")
-
-    def delete(self):
-        try:
-            MuscleHit(self.connection, self.exerciseType).deleteByExerciseType()
-            sql = "FROM EXERCISE_TYPE WHERE exercise_type = %s;"
-            self.cursor.execute(sql, (self.exerciseType,))
-            self.connection.commit()
-        except:
-            print(f"Could not delete record {self.exerciseType} from EXERCISE_TYPE.")
-
-    def get(self):
-        try:
-            sql = "SELECT * FROM EXERCISE_TYPE WHERE exercise_type = %s;"
-            self.cursor.execute(sql, (self.exerciseType,))
-            return self.cursor.fetchone()
-        except:
-            print(f"Could not get record with exercise_type {self.exerciseType} from EXERCISE_TYPE.")
-
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
-    
-# set (set_id, weight_done, reps, reps_in_reserve, time_taken)
 
 class Set:
     def __init__(self, connection, reps=None, weightDone=None, repsInReserve=None, timeTaken=None, id=None):
@@ -232,7 +177,7 @@ class Set:
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
 class SetsDone:
-    def __init__(self, connection, exercise, set):
+    def __init__(self, connection, exercise, set=None):
         self.connection = connection
         self.cursor = self.connection.cursor()
         self.exercise = exercise
@@ -248,13 +193,25 @@ class SetsDone:
             print(f"Could not create record {self.exercise}, {self.set} to SETS_DONE.")
 
     def delete(self):
+        if not self.set:
+            print("Deleting a record in SETS_DONE requires a set_id.")
+            return
         try:
             sql = "DELETE FROM SETS_DONE WHERE exercise = %s, set_id = %s;"
             self.cursor.execute(sql, (self.exercise, self.id))
-            self.connection.execute()
+            self.connection.commit()
             print(f"Deleted record {self.exercise}, {self.id} from SETS_DONE.")
         except:
             print(f"Could not delete record {self.exercise}, {self.id} from SETS_DONE.")
+
+    def deleteByExercise(self):
+        try:
+            sql = "DELETE FROM SETS_DONE WHERE exercise = %s;"
+            self.cursor.execute(sql, (self.exercise,))
+            self.connection.commit()
+            print(f"Deleted all records with exercise {self.exercise} from SETS_DONE.")
+        except:
+            print(f"Could not delete all records with exercise {self.exercise} from SETS_DONE.")
 
     def getByExercise(self):
         try:
@@ -264,8 +221,73 @@ class SetsDone:
         except:
             print(f"Could not get record with exercise {self.exercise} from SETS_DONE.")
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
-# exercise (exercise_type, sets_done(exercise_id, set_id))
+class Exercise:
+    def __init__(self, connection, workout_id, exercise, xfr=None, muscleHitList=None, setList=None):
+        self.connection = connection
+        self.cursor = self.connection.cursor()
+        self.workoutID = workout_id
+        self.exercise = exercise
+        self.xfr = xfr
+        self.muscleHitList = muscleHitList
+        self.setList = setList
+
+    def create(self):
+        try:
+            sql = "INSERT INTO EXERCISE (workout_id, exercise, xfr) VALUES (%s, %s, %s);"
+            self.cursor.execute(sql, (self.workoutID, self.exercise, self.xfr))
+            self.connection.commit()
+            print(f"Created record {self.workoutID}, {self.exercise}, {self.xfr} in EXERCISE.")
+
+            for muscleHit in self.muscleHitList:
+                MuscleHit(self.connection, self.exercise, muscleHit["muscle"], muscleHit["acticationLevel"]).create()
+
+            for set in self.setList:
+                Set(self.connection, set["reps"], set["weight_done"], set["reps_in_reserve"], set["time_taken"]).create()
+        except:
+            print(f"Could not create record {self.exercise}, {self.xfr} in EXERCISE.")
+
+    def update(self, xfr):
+        if not self.exercise:
+            print("Updating a record in EXERCISE required a value for exercise.")
+            return
+        try:
+            sql = "UPDATE EXERCISE SET xfr = %s WHERE exercise = %s and workout_id = %s;"
+            self.cursor.execute(sql, (xfr, self.exercise, self.workoutID))
+            self.connection.execute()
+            self.xfr = xfr
+            print(f"Updated record {self.xfr}, {self.exercise}, {self.workoutID} in EXERCISE.")
+        except:
+            print(f"Could not update record {self.xfr}, {self.exercise}, {self.workoutID} in EXERCISE.")
+
+    def delete(self):
+        try:
+            MuscleHit(self.connection, self.exercise).deleteByExercise()
+            SetsDone(self.connection, self.exercise).deleteByExercise()
+            sql = "FROM EXERCISE WHERE exercise = %s;"
+            self.cursor.execute(sql, (self.exercise,))
+            self.connection.commit()
+        except:
+            print(f"Could not delete record {self.exercise} from EXERCISE.")
+
+    def get(self):
+        try:
+            sql = "SELECT * FROM EXERCISE WHERE exercise = %s AND workout_id = %s;"
+            self.cursor.execute(sql, (self.exercise, self.workoutID))
+            return self.cursor.fetchone()
+        except:
+            print(f"Could not get record with exercise {self.exercise}, {self.workoutID} from EXERCISE.")
+    
+    def getMuscleHitList(self):
+        return MuscleHit(self.connection, self.exercise).getByExercise()
+
+    def getSetsDone(self):
+        return SetsDone(self.connection, self.exercise).getByExercise()
+
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
 
 # User (fname, lname, dob, weight, lbs_kg, username, user_id)
 
