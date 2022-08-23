@@ -1,11 +1,9 @@
-
-
 class Muscle:
     def __init__(self, connection, muscle=None):
-        self.muscle = muscle
         self.connection = connection
         self.cursor = self.connection.cursor()
-    
+        self.muscle = muscle
+
     def create(self):
         try:
             self.cursor.execute("INSERT IGNORE INTO MUSCLE (muscle) VALUES (%s);", (self.muscle, ))
@@ -32,8 +30,9 @@ class Muscle:
 
     def get(self):
         try:
-            self.cursor.execute("SELECT muscle FROM MUSCLE WHERE muscle = '%s';", (self.muscle, ))
-            return self.cursor.fetchone()
+            sql = "SELECT muscle FROM MUSCLE WHERE muscle = %s;"
+            self.cursor.execute(sql, (self.muscle,))
+            return {"muscle": self.cursor.fetchone()[0]}
         except:
             print(f"Could not get record {self.muscle} from MUSCLE.")
 

@@ -1,16 +1,27 @@
-import flask
-import DatabaseConnection
+from sanic import Sanic
+from sanic.response import text, json
+from databaseConnection import DatabaseConnection
+from objects import *
 
-Gym_API = flask.Flask(__name__)
-Gym_API.config["DEBUG"] = True
+
+db = DatabaseConnection()
+app = Sanic("gym-api")
+
+muscleHitList = [{"muscle": "Chest", "activation_level": 8}, {"muscle": "Tricep", "activation_level": 5}]
+setList = [{"weight_done": 225, "reps": 6, "reps_in_reserve": None, "time_taken": None}, 
+            {"weight_done": 225, "reps": 6, "reps_in_reserve": None, "time_taken": None}]
 
 
-@Gym_API.route('/', methods=['GET'])
-def home():
-    return "<h1>Distant Reading Archive</h1><p>This site is a prototype API for distant reading of science fiction novels.</p>"
+@app.get("/muscle/<tag>")
+async def tag_handler(request, tag):
+    return json(Muscle(db.connection(),tag).get())
 
-Gym_API.run()
+
+# ExerciseType(db.connection(), "Bench Press", 8, muscleHitList).create()
+
+# benchPress = Exercise(db.connection(), 1, "Bench Press", "Bench Press", setList).create()
+
 
 if __name__ == '__main__':
-    db = DatabaseConnection
-    
+    app.run(dev=True)
+    # print(Muscle(db.connection(),"Tricep").get())
