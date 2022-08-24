@@ -38,6 +38,8 @@ CREATE TABLE IF NOT EXISTS `gym_app`.`USER` (
   `weight` INT NULL,
   `lbs_kg` TINYINT NOT NULL DEFAULT 0,
   `username` NVARCHAR(45) NOT NULL,
+  `password` NVARCHAR(256) NOT NULL,
+  `salt` NVARCHAR(32) NULL,
   PRIMARY KEY (`username`))
 ENGINE = InnoDB;
 
@@ -163,6 +165,25 @@ CREATE TABLE IF NOT EXISTS `gym_app`.`SETS_DONE` (
   CONSTRAINT `workout-id-fk-sets_done`
     FOREIGN KEY (`workout_id`)
     REFERENCES `gym_app`.`EXERCISE` (`workout_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `gym_app`.`SESSION`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `gym_app`.`SESSION` ;
+
+CREATE TABLE IF NOT EXISTS `gym_app`.`SESSION` (
+  `username` NVARCHAR(45) NOT NULL,
+  `session_id` INT NOT NULL AUTO_INCREMENT,
+  `expiration` NVARCHAR(11) NOT NULL,
+  PRIMARY KEY (`session_id`),
+  UNIQUE INDEX `username_UNIQUE` (`username` ASC) VISIBLE,
+  CONSTRAINT `username-session-fk`
+    FOREIGN KEY (`username`)
+    REFERENCES `gym_app`.`USER` (`username`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
