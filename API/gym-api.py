@@ -1,27 +1,24 @@
 from sanic import Sanic
-from sanic.response import text, json
 from databaseConnection import DatabaseConnection
-from objects import *
+from routes import *
 
 
-db = DatabaseConnection()
-app = Sanic("gym-api")
+if __name__ == '__main__':
+    db = DatabaseConnection()
+    app = Sanic("gym-api")
+    app.config.DB_CONNECTION = db.connection()
 
-muscleHitList = [{"muscle": "Chest", "activation_level": 8}, {"muscle": "Tricep", "activation_level": 5}]
-setList = [{"weight_done": 225, "reps": 6, "reps_in_reserve": None, "time_taken": None}, 
-            {"weight_done": 225, "reps": 6, "reps_in_reserve": None, "time_taken": None}]
+    app.add_route(MuscleRoute.as_view(), "/muscle/<muscle>")
+    app.run(dev=True)
 
 
-@app.get("/muscle/<tag>")
-async def tag_handler(request, tag):
-    return json(Muscle(db.connection(),tag).get())
+
+
+# muscleHitList = [{"muscle": "Chest", "activation_level": 8}, {"muscle": "Tricep", "activation_level": 5}]
+# setList = [{"weight_done": 225, "reps": 6, "reps_in_reserve": None, "time_taken": None}, 
+#             {"weight_done": 225, "reps": 6, "reps_in_reserve": None, "time_taken": None}]
 
 
 # ExerciseType(db.connection(), "Bench Press", 8, muscleHitList).create()
 
 # benchPress = Exercise(db.connection(), 1, "Bench Press", "Bench Press", setList).create()
-
-
-if __name__ == '__main__':
-    app.run(dev=True)
-    # print(Muscle(db.connection(),"Tricep").get())
