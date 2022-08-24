@@ -1,3 +1,14 @@
+
+def constructRes(http_code, message, body = None):
+    return {
+        "success": True if (http_code / 100 == 2) else False,
+        "HTTP/1.1": http_code,
+        "message": message,
+        "Content-Type:": "application/json",
+        "body": body
+        }
+
+
 class Muscle:
     def __init__(self, connection, muscle=None):
         self.connection = connection
@@ -8,40 +19,55 @@ class Muscle:
         try:
             self.cursor.execute("INSERT IGNORE INTO MUSCLE (muscle) VALUES (%s);", (self.muscle, ))
             self.connection.commit()
-            print(f"Created record {self.muscle} in MUSCLE.")
+            message = f"Created record {self.muscle} in MUSCLE."
+            return constructRes(201, message)
         except:
-            print(f"Could not create record {self.muscle} in MUSCLE.")
+            message = f"Could not create record {self.muscle} in MUSCLE."
+            return constructRes(400, message)
 
     def delete(self):
         try:
             self.cursor.execute("DELETE FROM MUSCLE WHERE muscle = %s;", (self.muscle, ))
             self.connection.commit()
-            print(f"Deleted record {self.muscle} from MUSCLE.")
+            message  = f"Deleted record {self.muscle} from MUSCLE."
+            return constructRes(204, message)
         except:
-            print(f"Could not delete record {self.muscle} from MUSCLE.")
-
-    def deleteAll(self):
-        try:
-            self.cursor.execute("DELETE FROM MUSCLE;")
-            self.connection.commit()
-            print(f"Deleted all records from MUSCLE.")
-        except:
-            print(f"Could not delete all records from MUSCLE.")
+            message = f"Could not delete record {self.muscle} from MUSCLE."
+            return constructRes(400, message)
 
     def get(self):
         try:
             sql = "SELECT muscle FROM MUSCLE WHERE muscle = %s;"
             self.cursor.execute(sql, (self.muscle,))
-            return {"muscle": self.cursor.fetchone()[0]}
+            message = f"Retrived record {self.muscle} from MUSCLE."
+            body = {"muscle": self.cursor.fetchone()[0]}
+            return constructRes(200, message, body)
         except:
-            print(f"Could not get record {self.muscle} from MUSCLE.")
+            message = f"Could not get record {self.muscle} from MUSCLE."
+            return constructRes(400, message)
+
+    def deleteAll(self):
+        try:
+            self.cursor.execute("DELETE FROM MUSCLE;")
+            self.connection.commit()
+            message = f"Deleted all records from MUSCLE."
+            return constructRes(204, message)
+        except:
+            message = f"Could not delete all records from MUSCLE."
+            return constructRes(400, message)
 
     def getAll(self):
         try:
             self.cursor.execute("SELECT muscle FROM MUSCLE;")
-            return self.cursor.fetchall()
+            data = []
+            for item in self.cursor.fetchall():
+                data.append(item[0])
+            message = "Retrieved all records from MUSCLE"
+            body = {"muscle": data}
+            return constructRes(201, message, body)
         except:
-            print(f"Couldn't get record from MUSCLE, none exist.")
+            message = "Could not retrieve all records from MUSCLE"
+            return constructRes(400, message)
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 

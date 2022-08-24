@@ -9,6 +9,7 @@ if __name__ == '__main__':
     app.config.DB_CONNECTION = db.connection()
 
     app.add_route(MuscleRoute.as_view(), "/muscle/<muscle>")
+    app.add_route(MusclesRoute.as_view(), "/muscles")
     app.run(dev=True)
 
 

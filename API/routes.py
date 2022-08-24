@@ -1,3 +1,4 @@
+from urllib import response
 from sanic.views import HTTPMethodView
 from sanic.response import json, text
 import json as j
@@ -11,10 +12,19 @@ class MuscleRoute(HTTPMethodView):
     async def post(self, request, muscle):
         data = j.loads(request.body)
         asdf = data["muscle"]
-        Muscle(request.app.config.DB_CONNECTION, data["muscle"]).create()
-        return text(f"Muscle: {asdf} has been created.")
+        response = Muscle(request.app.config.DB_CONNECTION, data["muscle"]).create()
+        return json(response)
 
     def delete(self, request, muscle):
-        Muscle(request.app.config.DB_CONNECTION, muscle).delete()
-        return text(f"Muscle: {muscle} has been deleted.")
+        response = Muscle(request.app.config.DB_CONNECTION, muscle).delete()
+        return text(response)
 
+class MusclesRoute(HTTPMethodView):
+
+    def get(self, request):
+        response = Muscle(request.app.config.DB_CONNECTION).getAll()
+        return json(response)
+
+    def delete(self, request):
+        response = Muscle(request.app.config.DB_CONNECTION).deleteAll()
+        return text(response)
