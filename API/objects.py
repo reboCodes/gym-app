@@ -1,13 +1,12 @@
 
 def constructRes(http_code, message, body = None):
     return {
-        "success": True if (http_code / 100 == 2) else False,
+        "success": True if (int(http_code / 100) == 2) else False,
         "HTTP/1.1": http_code,
+        # "Content-Type:": "application/json",
         "message": message,
-        "Content-Type:": "application/json",
         "body": body
         }
-
 
 class Muscle:
     def __init__(self, connection, muscle=None):
@@ -379,6 +378,67 @@ class Exercise:
 
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
+class User:
+    def __init__(self, connection, data):
+        self.connection = connection
+        self.cursor = self.connection.cursor()
+        self.data = data
+
+    def create(self):
+        try:
+            sql = """INSERT IGNORE INTO USER (fname, lname, username, password, salt, lbs_kg, dob, weight, email)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);"""
+            self.cursor.execute(sql, (
+                self.data["fname"],
+                self.data["lname"],
+                self.data["username"],
+                self.data["password"],
+                self.data["salt"],
+                self.data["lbs_kg"],
+                self.data["dob"],
+                self.data["weight"],
+                self.data["email"]
+            ))
+            self.connection.commit()
+            message = f'Created record {self.data["username"]} in USER.'
+            return constructRes(201, message)
+        except:
+            message = f'Could not create record {self.data["username"]} in USER.'
+            return constructRes(400, message)
+
+    def update(self):
+        return
+
+    def get(self):
+        try:
+            sql = "SELECT * FROM USER WHERE username = %s;"
+            self.cursor.execute(sql, (self.data,))
+            message = f"Retrived record username: {self.data} from USER."
+            data = self.cursor.fetchall()[0]
+            body = {
+                "fname": data[0],
+                "lname": data[1],
+                "dob": data[2],
+                "weight": data[3],
+                "lbs_kg": data[4],
+                "username": data[5],
+                "email": data[8]
+                }
+            return constructRes(200, message, body)
+        except:
+            message = f"Could not retrive record username: {self.data} from USER."
+            return constructRes(400, message)
+
+    def delete(self):
+        try:
+            self.cursor.execute("DELETE FROM USER WHERE user = %s;", (self.username, ))
+            self.connection.commit()
+            message  = f"Deleted record username: {self.username} from USER."
+            return constructRes(204, message)
+        except:
+            message = f"Could not delete record username: {self.username} from USER."
+            return constructRes(400, message)
 
 
 # User (fname, lname, dob, weight, lbs_kg, username, user_id)

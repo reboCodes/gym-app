@@ -6,12 +6,17 @@ from routes import *
 if __name__ == '__main__':
     db = DatabaseConnection()
     app = Sanic("gym-api")
-    app.config.DB_CONNECTION = db.connection()
+    app.config.DB = db.connection()
 
+
+    app.add_route(MuscleRoute.as_view(), "/muscle")
     app.add_route(MuscleRoute.as_view(), "/muscle/<muscle>")
-    app.add_route(MusclesRoute.as_view(), "/muscles")
-    app.run(dev=True)
 
+    app.add_route(UserRoute.as_view(), "/user")
+    app.add_route(UserRoute.as_view(), "/user/<username>")
+
+
+    app.run(dev=True)
 
 
 
