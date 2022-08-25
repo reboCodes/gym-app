@@ -40,6 +40,7 @@ CREATE TABLE IF NOT EXISTS `gym_app`.`USER` (
   `username` NVARCHAR(45) NOT NULL,
   `password` NVARCHAR(256) NOT NULL,
   `salt` NVARCHAR(32) NULL,
+  `email` NVARCHAR(45) NULL,
   PRIMARY KEY (`username`))
 ENGINE = InnoDB;
 
