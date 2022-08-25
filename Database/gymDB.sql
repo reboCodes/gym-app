@@ -38,8 +38,8 @@ CREATE TABLE IF NOT EXISTS `gym_app`.`USER` (
   `weight` INT NULL,
   `lbs_kg` TINYINT NOT NULL DEFAULT 0,
   `username` NVARCHAR(45) NOT NULL,
-  `password` NVARCHAR(256) NOT NULL,
-  `salt` NVARCHAR(32) NULL,
+  `password` VARBINARY(256) NOT NULL,
+  `salt` VARBINARY(32) NULL,
   `email` NVARCHAR(45) NULL,
   PRIMARY KEY (`username`))
 ENGINE = InnoDB;
