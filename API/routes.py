@@ -5,7 +5,7 @@ from objects import *
 
 class MuscleRoute(HTTPMethodView):
 
-    def get(self, request, muscle):
+    def get(self, request, muscle=None):
         response = Muscle(request.app.config.DB, muscle).get() if muscle else Muscle(request.app.config.DB).getAll()
         return json(response)
 
@@ -27,5 +27,14 @@ class UserRoute(HTTPMethodView):
 
     def get(self, request, username):
         response = User(request.app.config.DB, username).get()
+        return json(response)
+    
+    def put(self, request, username):
+        data = j.loads(request.body)
+        response = User(request.app.config.DB, data, username).update()
+        return json(response)
+
+    def delete(self, request, username):
+        response = User(request.app.config.DB, username).delete()
         return json(response)
 

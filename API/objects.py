@@ -1,3 +1,5 @@
+import hashlib
+import os
 
 def constructRes(http_code, message, body = None):
     return {
@@ -380,21 +382,28 @@ class Exercise:
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
 class User:
-    def __init__(self, connection, data):
+    def __init__(self, connection, data, username=None):
         self.connection = connection
         self.cursor = self.connection.cursor()
+        self.username = username
         self.data = data
+
+    def hashPass(self):
+        salt = os.urandom(32)
+        return salt, hashlib.pbkdf2_hmac('sha256', self.data["password"].encode('utf-8'), salt, 100000)
 
     def create(self):
         try:
+            salt, password = self.hashPass()
+
             sql = """INSERT IGNORE INTO USER (fname, lname, username, password, salt, lbs_kg, dob, weight, email)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);"""
             self.cursor.execute(sql, (
                 self.data["fname"],
                 self.data["lname"],
                 self.data["username"],
-                self.data["password"],
-                self.data["salt"],
+                password,
+                salt,
                 self.data["lbs_kg"],
                 self.data["dob"],
                 self.data["weight"],
@@ -408,8 +417,33 @@ class User:
             return constructRes(400, message)
 
     def update(self):
-        return
+        try:
+            if self.data["updatePass"]:
+                salt, password = self.hashPass()
+                sql = "UPDATE USER SET password=%s, salt=%s where username=%s;"
+                message = f'Updated record for username: {self.username} in USER.'
+                self.cursor.execute(sql, (salt, password, self.username))
 
+            else:
+                sql = """UPDATE USER SET fname=%s, lname=%s, username=%s, lbs_kg=%s, dob=%s, weight=%s, email=%s
+                    WHERE username=%s;"""
+                message = f'Updated record for username: {self.data["username"]} in USER.'
+                self.cursor.execute(sql, (
+                    self.data["fname"],
+                    self.data["lname"],
+                    self.data["username"],
+                    self.data["lbs_kg"],
+                    self.data["dob"],
+                    self.data["weight"],
+                    self.data["email"],
+                    self.username
+                ))
+            self.connection.commit()
+            return constructRes(200, message)
+        except:
+            message = f'Could not create record for username: {self.data["username"]} in USER.'
+            return constructRes(400, message)
+            
     def get(self):
         try:
             sql = "SELECT * FROM USER WHERE username = %s;"
@@ -432,12 +466,12 @@ class User:
 
     def delete(self):
         try:
-            self.cursor.execute("DELETE FROM USER WHERE user = %s;", (self.username, ))
+            self.cursor.execute("DELETE FROM USER WHERE username = %s;", (self.data, ))
             self.connection.commit()
-            message  = f"Deleted record username: {self.username} from USER."
+            message  = f"Deleted record username: {self.data} from USER."
             return constructRes(204, message)
         except:
-            message = f"Could not delete record username: {self.username} from USER."
+            message = f"Could not delete record username: {self.data} from USER."
             return constructRes(400, message)
 
 
