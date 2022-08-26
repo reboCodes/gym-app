@@ -1,6 +1,7 @@
 from sanic import Sanic
 from databaseConnection import DatabaseConnection
-from routes import *
+from httpMethods import *
+from objects import *
 
 
 if __name__ == '__main__':
@@ -15,6 +16,8 @@ if __name__ == '__main__':
     app.add_route(UserRoute.as_view(), "/user")
     app.add_route(UserRoute.as_view(), "/user/<username>")
 
+    app.add_route(WorkoutPlanRoute.as_view(), "/workout-plan")
+    app.add_route(WorkoutPlanRoute.as_view(), "/workout-plan/<workoutId>")
 
     app.run(dev=True)
 

@@ -1,0 +1,11 @@
+
+User:
+post: new user
+{"fname": "Reggie2","lname": "Scerbo2","dob": null, "weight": null, "lbs_kg": 0,
+"username": "rebo2", "email": "reggie@test.com", "password":"password"}
+post: test password
+{"password": "password", "check_password": true, "username": "rebo12"}
+
+WorkoutPlan:
+post: new WORKOUT_PLAN
+{"username": "Reggie2", "date": "2022-08-26", "start_time": null, "end_time": null, "is_started": null, "workout_name": "Back Day"}

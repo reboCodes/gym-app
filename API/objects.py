@@ -286,9 +286,17 @@ class SetsDone:
 
     def deleteByExercise(self):
         try:
+            # get list of set_ids of related sets
+            sql = "SELECT set_id FROM SETS_DONE WHERE exercise = %s, workout_id = %s;"
+            self.cursor.execute(sql, (self.exercise, self.workoutID))
+            setList = self.cursor.fetchall()[0]
+            # delete sets_done
             sql = "DELETE FROM SETS_DONE WHERE exercise = %s, workout_id = %s;"
             self.cursor.execute(sql, (self.exercise, self.workoutID))
             self.connection.commit()
+            # delete related sets
+            for setId in setList:
+                Set(self.connection, id=setId).delete()
             print(f"Deleted all records with exercise {self.exercise}, workout_id {self.workoutID} from SETS_DONE.")
         except:
             print(f"Could not delete all records with exercise {self.exercise}, workout_id {self.workoutID} from SETS_DONE.")
@@ -378,6 +386,73 @@ class Exercise:
     def getSetsDone(self):
         return SetsDone(self.connection, self.exerciseName).getByExercise()
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
+class WorkoutPlan:
+    def __init__(self, connection, data, workoutId=None):
+        self.connection = connection
+        self.cursor = self.connection.cursor()
+        self.data = data
+        self.workoutId = workoutId
+
+    def get(self):
+        try:
+            sql = "SELECT * FROM WORKOUT_PLAN WHERE workout_id = %s;"
+            self.cursor.execute(sql, (self.data,))
+            data = self.cursor.fetchone()
+            body = {
+                "workout_id": data[0],
+                "username": data[1],
+                "date": data[2],
+                "start_time": data[3],
+                "end_time": data[4],
+                "is_started": data[5],
+                "workout_name": data[6]
+            }
+            message = f'Retrived record workout_id: {self.data} from WORKOUT_PLAN.'
+            return constructRes(200, message, body)
+        except:
+            message = f'Could not retrive record workout_id: {self.data} from WORKOUT_PLAN.'
+            return constructRes(400, message)
+
+    def create(self):
+        try:
+            sql = "INSERT INTO WORKOUT_PLAN (username, date, start_time, end_time, is_started, workout_name) VALUES (%s,%s,%s,%s,%s,%s);"
+            self.cursor.execute(sql, (
+                self.data["username"],
+                self.data["date"],
+                self.data["start_time"],
+                self.data["end_time"],
+                self.data["is_started"],
+                self.data["workout_name"]
+            ))
+            self.connection.commit()
+            message = f'Created record workout_name: {self.data["workout_name"]} in WORKOUT_PLAN.'
+            return constructRes(201, message)
+        except:
+            message = f'Could not create record workout_name: {self.data["workout_name"]} in WORKOUT_PLAN.'
+            return constructRes(400, message)
+
+    def update(self):
+        try:
+            sql = """UPDATE WORKOUT_PLAN SET username=%s, date=%s, start_time=%s, end_time=%s, is_started=%s, workout_name=%s
+                    WHERE workout_id=%s;"""
+            self.cursor.execute(sql, (
+                self.data["username"],
+                self.data["date"],
+                self.data["start_time"],
+                self.data["end_time"],
+                self.data["is_started"],
+                self.data["workout_name"],
+                self.workoutId,
+            ))
+            self.connection.commit()
+            message = f'Updated record workout_name: {self.data["workout_name"]} in WORKOUT_PLAN.'
+            return constructRes(200, message)
+        except:
+            message = f'Could not Update record workout_name: {self.data["workout_name"]} in WORKOUT_PLAN.'
+            return constructRes(400, message)
+
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 
@@ -396,7 +471,7 @@ class User:
 
     def checkPass(self):
         try:
-            self.cursor.execute("SELECT salt, password FROM USER WHERE username=%s", (self.data["username"],))
+            self.cursor.execute("SELECT salt, password FROM USER WHERE username=%s;", (self.data["username"],))
             output = self.cursor.fetchone()
             self.salt = output[0]
             if (bytes(output[1]) == self.hashPass()):
@@ -424,10 +499,10 @@ class User:
                 self.data["email"]
             ))
             self.connection.commit()
-            message = f'Created record {self.data["username"]} in USER.'
+            message = f'Created record username: {self.data["username"]} in USER.'
             return constructRes(201, message)
         except:
-            message = f'Could not create record {self.data["username"]} in USER.'
+            message = f'Could not create record username: {self.data["username"]} in USER.'
             return constructRes(400, message)
 
     def update(self):
@@ -488,8 +563,6 @@ class User:
             message = f"Could not delete record username: {self.data} from USER."
             return constructRes(400, message)
 
-
-# User (fname, lname, dob, weight, lbs_kg, username, user_id)
 
 # exercise (workout_id, exercise_type(exercise_type_name, exercise_type_id, xfr), sets_done(exercise_id, set_id), exercise_id)
 
