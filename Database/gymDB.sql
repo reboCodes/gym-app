@@ -53,7 +53,7 @@ DROP TABLE IF EXISTS `gym_app`.`WORKOUT_PLAN` ;
 CREATE TABLE IF NOT EXISTS `gym_app`.`WORKOUT_PLAN` (
   `workout_id` INT NOT NULL AUTO_INCREMENT,
   `username` NVARCHAR(45) NOT NULL,
-  `date` DATE NOT NULL,
+  `date` NVARCHAR(45) NOT NULL,
   `start_time` TIME NULL,
   `end_time` TIME NULL,
   `is_started` TINYINT NULL,
