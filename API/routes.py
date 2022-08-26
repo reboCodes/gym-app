@@ -22,7 +22,10 @@ class MuscleRoute(HTTPMethodView):
 class UserRoute(HTTPMethodView):
     def post(self, request):
         data = j.loads(request.body)
-        response = User(request.app.config.DB, data).create()
+        if data["check_password"]:
+            response = User(request.app.config.DB, data).checkPass()
+        else:
+            response = User(request.app.config.DB, data).create()
         return json(response)
 
     def get(self, request, username):

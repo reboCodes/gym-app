@@ -387,14 +387,28 @@ class User:
         self.cursor = self.connection.cursor()
         self.username = username
         self.data = data
+        self.salt = None
 
     def hashPass(self):
-        salt = os.urandom(32)
-        return salt, hashlib.pbkdf2_hmac('sha256', self.data["password"].encode('utf-8'), salt, 100000)
+        if not self.salt:
+            self.salt = os.urandom(32)
+        return hashlib.pbkdf2_hmac('sha256', self.data["password"].encode('utf-8'), self.salt, 100000)
+
+    def checkPass(self):
+        try:
+            self.cursor.execute("SELECT salt, password FROM USER WHERE username=%s", (self.data["username"],))
+            output = self.cursor.fetchone()
+            self.salt = output[0]
+            if (bytes(output[1]) == self.hashPass()):
+                return constructRes(200, "Correct Password.", {"correct_password": True})
+            else:
+                return constructRes(400, "Incorrect Username or Password.")
+        except:
+            return constructRes(400, "Incorrect Username or Password.")
 
     def create(self):
         try:
-            salt, password = self.hashPass()
+            password = self.hashPass()
 
             sql = """INSERT IGNORE INTO USER (fname, lname, username, password, salt, lbs_kg, dob, weight, email)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);"""
@@ -403,7 +417,7 @@ class User:
                 self.data["lname"],
                 self.data["username"],
                 password,
-                salt,
+                self.salt,
                 self.data["lbs_kg"],
                 self.data["dob"],
                 self.data["weight"],
@@ -419,10 +433,10 @@ class User:
     def update(self):
         try:
             if self.data["updatePass"]:
-                salt, password = self.hashPass()
+                password = self.hashPass()
                 sql = "UPDATE USER SET password=%s, salt=%s where username=%s;"
                 message = f'Updated record for username: {self.username} in USER.'
-                self.cursor.execute(sql, (salt, password, self.username))
+                self.cursor.execute(sql, (password, self.salt, self.username))
 
             else:
                 sql = """UPDATE USER SET fname=%s, lname=%s, username=%s, lbs_kg=%s, dob=%s, weight=%s, email=%s
