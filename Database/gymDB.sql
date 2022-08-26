@@ -57,6 +57,7 @@ CREATE TABLE IF NOT EXISTS `gym_app`.`WORKOUT_PLAN` (
   `start_time` TIME NULL,
   `end_time` TIME NULL,
   `is_started` TINYINT NULL,
+  `workout_name` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`workout_id`),
   INDEX `username-fk_idx` (`username` ASC) VISIBLE,
   CONSTRAINT `username-fk`
