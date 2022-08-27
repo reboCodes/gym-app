@@ -62,10 +62,10 @@ class Muscle:
             self.cursor.execute("SELECT muscle FROM MUSCLE;")
             data = []
             for item in self.cursor.fetchall():
-                data.append(item[0])
+                data.append({"muscle": item[0]})
             message = "Retrieved all records from MUSCLE"
-            body = {"muscle": data}
-            return constructRes(201, message, body)
+            body = {"muscles": data}
+            return body
         except:
             message = "Could not retrieve all records from MUSCLE"
             return constructRes(400, message)
